@@ -181,9 +181,8 @@ void HighlightKey(uint8_t Key)
 	}
 }
 
-void DisplayScreenSwipe(uint8_t Detail)
+void DisplayScreenSwipe(uint8_t Detail, uint8_t StartEnd)
 {
-	uint8_t i;
 	//display has been swiped / dragged
 	//draw a line down the middle of the display
 	memset(OLEDBuf, 0x00, sizeof(OLEDBuf));
@@ -192,6 +191,11 @@ void DisplayScreenSwipe(uint8_t Detail)
 		PrintString(16,1, "SWIPED LEFT");
 	else
 		PrintString(16,1, "SWIPED RIGHT");
+	//draw in / out text
+	char InOut[8] = "X to X";
+	InOut[0] = ((StartEnd >> 4) & 0b0111) + '0';
+	InOut[5] = (StartEnd & 0b0111) + '0';
+	PrintString(40,2, InOut);
 }
 
 void DisplayKeySwipe(uint8_t Detail, uint8_t StartEnd)
@@ -278,7 +282,7 @@ void DisplayUpdate(bool Activity)
 		else
 		{
 			//key swipe bits were not set, the screen was swiped left/right
-			DisplayScreenSwipe(SSD7317_Gesture_Data.Detail);
+			DisplayScreenSwipe(SSD7317_Gesture_Data.Detail, SSD7317_Gesture_Data.StartEnd);
 			Serial.println("Disp = Incell Disp Swipe");
 		}
 
