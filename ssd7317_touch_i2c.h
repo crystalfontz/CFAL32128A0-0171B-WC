@@ -35,3 +35,13 @@ extern volatile uint8_t SSD7317_Raw_Data[8];
 void SSD7317_Touch_Init(void);
 void SSD7317_Touch_HWI2C(bool enable);
 void SSD7317_Touch_Handle(void);
+
+//touch feature settings
+void SSD7317_NM_GestureEnable(uint16_t enable);
+void SSD7317_LPM_GestureEnable(uint16_t enable);
+void SSD7317_TouchThreshold_Set(uint16_t threshold);
+void SSD7317_LongTap_Frames_Set(uint16_t frames);
+void SSD7317_SingleTap_MaxFrames_Set(uint16_t frames);
+void SSD7317_SkipFrames_AfterGestureReport(uint16_t frames);
+void SSD7317_LPM_ScanRate_Set(uint16_t rate);
+void SSD7317_ReportingMode_Set(uint16_t mode);

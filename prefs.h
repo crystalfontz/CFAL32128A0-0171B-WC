@@ -1,7 +1,7 @@
 #pragma once
 //==============================================================================
 //
-//  CRYSTALFONTZ CFAL64128A0-096B-WC EXAMPLE FIRMWARE
+//  CRYSTALFONTZ CFAL32128A0-0171B-WC EXAMPLE FIRMWARE
 //
 //  Project settings
 //

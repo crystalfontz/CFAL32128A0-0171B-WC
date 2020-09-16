@@ -1,6 +1,6 @@
 //==============================================================================
 //
-//  CRYSTALFONTZ CFAL64128A0-096B-WC EXAMPLE FIRMWARE
+//  CRYSTALFONTZ CFAL32128A0-0171B-WC EXAMPLE FIRMWARE
 //
 //  TOUCH PANEL CONTROLLER INTERFACE FIRMWARE
 //
@@ -100,10 +100,10 @@ void SSD7317_Touch_Init(void)
 	pinMode(SSD7317_TOUCH_IRQ, INPUT_PULLUP);
 
 	//i2c setup
-	//we are using software i2c master mode, software
-	// so nothing to do here
+	//we are using software i2c master mode
+	// so nothing to do here for the moment
 
-	//reset
+	//reset touch controller
 	digitalWrite(SSD7317_TOUCH_RST, LOW);
 	delay(10);
 	digitalWrite(SSD7317_TOUCH_RST, HIGH);
@@ -111,6 +111,10 @@ void SSD7317_Touch_Init(void)
 
 	//run setup commands
 	SSD7317_Touch_Setup();
+
+	//more touch settings
+	SSD7317_NM_GestureEnable(0b100011111); //all gestures enabled
+	SSD7317_TouchThreshold_Set(100); //default sensitivity
 
 	//setup interrupt handler for touches
 	attachInterrupt(digitalPinToInterrupt(SSD7317_TOUCH_IRQ), SSD7317_Touch_IRQ, FALLING);
@@ -543,6 +547,112 @@ static void SSD7317_Touch_Setup(void)
 
 	//done
 	LOG_LN("SSD7317_Touch_Setup() done");
+}
+
+//////////////////////////////////////////////////////////
+
+void SSD7317_NM_GestureEnable(uint16_t enable)
+{
+	//normal-mode touch gestures setup
+	// bit 0 = enables incell tap
+	// bit 1 = enables incell hold
+	// bit 2 = unsure
+	// bit 3 = enables incell left/right swipes
+	// bit 4 = enables incell up/down swipes
+	// bit 5-7 = not used (must be 0)
+	// bit 8 = enables outcell tap/hold
+	// bit 9-15 = not used (must be 0)
+	uint8_t		data[2];
+	uint16_t	buf;
+
+	if (enable & 0xFEE0)
+		return;
+
+	SSD7317_TIC_CPU_BurstRead(0x005D, data, 2);
+
+	buf = (data[1] << 8) | data[0];
+	buf = (buf & 0xFEE0) | enable;
+
+	data[0] = (uint8_t) buf;
+	data[1] = (uint8_t) (buf >> 8);
+	SSD7317_TIC_CPU_BurstWrite(0x005D, data, 2);
+}
+
+void SSD7317_LPM_GestureEnable(uint16_t enable)
+{
+	//low-power mode touch gestures setup
+	uint8_t		data[2];
+	uint16_t	buf;
+
+	if(enable & 0xFF1F)
+		return;
+
+	SSD7317_TIC_CPU_BurstRead(0x005D, data, 2);
+	buf = (data[1] << 8) | data[0];
+	buf = (buf & 0xFF1F) | enable;
+	data[0] = (uint8_t) buf;
+	data[1] = (uint8_t) (buf >> 8);
+	SSD7317_TIC_CPU_BurstWrite(0x005D, data, 2);
+}
+
+void SSD7317_TouchThreshold_Set(uint16_t threshold)
+{
+	//set touch threshold of tap for NM & LPM mode
+	//default is 100. lower value is more sensitive.
+	uint8_t		wd[2];
+	wd[0] = (uint8_t)((threshold >> 0) & 0xFF);
+	wd[1] = (uint8_t)((threshold >> 8) & 0xFF);
+	SSD7317_TIC_CPU_BurstWrite(0x005F, wd, 2);
+}
+
+void SSD7317_LongTap_Frames_Set(uint16_t frames)
+{
+	//set frame number with touch on for long tap gesture
+	uint8_t         wd[2];
+	wd[0] = (uint8_t)((frames >> 0) & 0xFF);
+	wd[1] = (uint8_t)((frames >> 8) & 0xFF);
+	SSD7317_TIC_CPU_BurstWrite(0x0082, wd, 2);
+}
+
+void SSD7317_SingleTap_MaxFrames_Set(uint16_t frames)
+{
+	//set max frame numbers with touch on for single tap gesture
+	//if over this number, single tap fails
+	uint8_t         wd[2];
+	wd[0] = (uint8_t)((frames >> 0) & 0xFF);
+	wd[1] = (uint8_t)((frames >> 8) & 0xFF);
+	SSD7317_TIC_CPU_BurstWrite(0x0083, wd, 2);
+}
+
+void SSD7317_SkipFrames_AfterGestureReport(uint16_t frames)
+{
+	//set frame number skipped after gesture event recognized
+	uint8_t         wd[2];
+	wd[0] = (uint8_t)((frames >> 0) & 0xFF);
+	wd[1] = (uint8_t)((frames >> 8) & 0xFF);
+	SSD7317_TIC_CPU_BurstWrite(0x0085, wd, 2);
+}
+
+void SSD7317_LPM_ScanRate_Set(uint16_t rate)
+{
+	//set touch sensing scan rate setting for Low Power Mode
+	uint8_t         wd[2];
+	wd[0] = (uint8_t)((rate >> 0) & 0xFF);
+	wd[1] = (uint8_t)((rate >> 8) & 0xFF);
+	SSD7317_TIC_CPU_BurstWrite(0x00AC, wd, 2);
+}
+
+#define REPORT_MODE_GESTURE     0
+#define REPORT_MODE_MODIFIED    4
+
+void SSD7317_ReportingMode_Set(uint16_t mode)
+{
+	//set reporting mode
+	uint8_t         wd[2];
+	wd[0] = (uint8_t)((mode >> 0) & 0xFF);
+	wd[1] = (uint8_t)((mode >> 8) & 0xFF);
+	SSD7317_TIC_CPU_BurstWrite(0x0050, wd, 2);
+	//SSD7317_TOUCH_IRQ_ReportMode(mode);
 }
 
 //////////////////////////////////////////////////////////
