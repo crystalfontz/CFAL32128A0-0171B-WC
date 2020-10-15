@@ -97,7 +97,7 @@ void setup()
 	//blank the display buffer, intro text
 	memset(OLEDBuf, 0x00, sizeof(OLEDBuf));
 	PrintString(16,0, "CRYSTALFONTZ");
-	PrintString(20,2, "CFAL32128B0");
+	PrintString(20,2, "CFAL32128A0");
 	PrintString(32,3, "0171B-WC");
 	SSD7317_OLED_WriteBuffer(OLEDBuf);
 	delay(1000);
