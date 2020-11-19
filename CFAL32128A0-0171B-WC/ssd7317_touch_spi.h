@@ -2,7 +2,7 @@
 
 #include "prefs.h"
 
-#ifdef TOUCH_I2C
+#ifdef TOUCH_SPI
 
 #include <Arduino.h>
 
