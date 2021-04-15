@@ -42,7 +42,7 @@
 #define SSD7317_OLED_SPI_DC		(8)				/*D/C*/
 
 //oled common pins
-#define SSD7317_OLED_RST		(PIN_A0)		/*RES*/
+#define SSD7317_OLED_RST		(3)		/*RES*/
 
 //SPI coms frequency
 #define SSD7317_OLED_SPI_FREQ	(8000000)
@@ -55,7 +55,7 @@
 #define SSD7317_TOUCH_SCL		(SCL)			/*TD0*/
 #define SSD7317_TOUCH_SDA		(SDA)			/*TD1,TD2*/
 #define SSD7317_TOUCH_CS		(9)				/*TCS*/
-#define SSD7317_TOUCH_RST		(PIN_A1)		/*TRES*/
+#define SSD7317_TOUCH_RST		(4)		/*TRES*/
 #define SSD7317_TOUCH_IRQ		(2)				/*IRQ*/
 
 ///////////////////////////////////////////////////////////////

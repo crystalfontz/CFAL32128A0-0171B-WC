@@ -11,7 +11,7 @@ https://www.crystalfontz.com/product/cfal32128a00171bwc
 | OLED / Touch Module Pin | Seeeduino Pin | Connection Description |
 |-------------------------|---------------|------------------------|
 | 17 (DCS)                | 10            | Display CS             |
-| 19 (RES)                | A0            | Display Reset          |
+| 19 (RES)                | 3             | Display Reset          |
 | 21 (D/C)                | 8             | Display D/C            |
 | 26 (D0)                 | 13 / SCK      | Display SPI SCK        |
 | 27 (D1)                 | 11 / MOSI     | Display SPI MOSI       |
@@ -22,7 +22,7 @@ https://www.crystalfontz.com/product/cfal32128a00171bwc
 | OLED / Touch Module Pin | Seeeduino Pin | Connection Description |
 |-------------------------|---------------|------------------------|
 | 17 (DCS)                | 3.3V          | Display CS (tied high) |
-| 19 (RES)                | A0            | Display Reset          |
+| 19 (RES)                | 3             | Display Reset          |
 | 21 (D/C)                | GND           | Display D/C (tied low) |
 | 26 (D0)                 | SCL           | Display I2C SCL        |
 | 27 (D1)                 | SDA           | Display I2C SDA        |
@@ -34,7 +34,7 @@ https://www.crystalfontz.com/product/cfal32128a00171bwc
 | OLED / Touch Module Pin | Seeeduino Pin | Connection Description |
 |-------------------------|---------------|------------------------|
 | 18 (TCS)                | 9             | Touch CS               |
-| 20 (TRES)               | A1            | Touch Reset            |
+| 20 (TRES)               | 4             | Touch Reset            |
 | 22 (IRQ)                | 2             | Touch IRQ              |
 | 23 (TD0)                | 13 / SCK      | Touch SPI SCK          |
 | 24 (TD1)                | 11 / MOSI     | Touch SPI MOSI         |
@@ -45,7 +45,7 @@ https://www.crystalfontz.com/product/cfal32128a00171bwc
 | OLED / Touch Module Pin | Seeeduino Pin | Connection Description |
 |-------------------------|---------------|------------------------|
 | 18 (TCS)                | 9             | Touch CS               |
-| 20 (TRES)               | A1            | Touch Reset            |
+| 20 (TRES)               | 4             | Touch Reset            |
 | 22 (IRQ)                | 2             | Touch IRQ              |
 | 23 (TD0)                | SCL           | Touch I2C SCL          |
 | 24 (TD1)                | SDA           | Touch I2C SDA          |
