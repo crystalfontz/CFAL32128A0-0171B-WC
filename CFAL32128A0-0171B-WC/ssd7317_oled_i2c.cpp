@@ -84,32 +84,41 @@ void SSD7317_OLED_Init(void)
 	SSD7317_OLED_Blank();
 }
 
-#define SEGS 16
 void SSD7317_OLED_WriteBuffer(uint8_t *buf)
 {
-	uint16_t i, j;
-	for (i = 0; i < ( SSD7317_OLED_HEIGHT * SSD7317_OLED_WIDTH / 8) / SEGS ; i++)
+	uint16_t i;
+
+	//set top left address
+
+	//split write into 32 byte blocks due to Arduino libs
+	//I2C buffer size limit
+	for (i = 0; i < (SSD7317_OLED_HEIGHT * SSD7317_OLED_WIDTH / 8) / 32; i++)
 	{
-		//we have to break this up into lots of SEGS due to Arduino I2C limitations
-		j = i*SEGS;
-		SSD7317_OLED_WR_CMD(0x21);		//col address
-		SSD7317_OLED_WR_CMD(j / 8);
-		SSD7317_OLED_WR_CMD(0x7F);
+		//update display ram loction if needed
+		if ((i % 4) == 0)
+		{
+			//start of page, set display ram position
+			SSD7317_OLED_WR_CMD(0x21);		//col address
+			SSD7317_OLED_WR_CMD(0);			//X (0 = left)
+			SSD7317_OLED_WR_CMD(0x7F);
 
-		SSD7317_OLED_WR_CMD(0x22);		//page address
-		SSD7317_OLED_WR_CMD(j % 8);
-		SSD7317_OLED_WR_CMD(0x07);		//128x64
-
+			SSD7317_OLED_WR_CMD(0x22);		//page address
+			SSD7317_OLED_WR_CMD(i >> 2);	//Y (0 = top, 3 = bottom)
+			SSD7317_OLED_WR_CMD(0x07);
+		}
+		//write data
 		Wire.beginTransmission(SSD7317_OLED_I2C_ADDR);
-		Wire.write(0x40); //control byte, data bit set
-		Wire.write(&buf[j], SEGS);
-		Wire.endTransmission();
+		Wire.write(0x40);				//send control byte, data bit set
+		Wire.write(buf, 32);			//write 32 bytes
+		buf += 32;						//next buf location
+		Wire.endTransmission();			//end
 	}
 }
 
 void SSD7317_OLED_Blank(void)
 {
 	//blank the display
+	//*needs to be optimised*
 	SSD7317_OLED_WR_CMD(0x21);		//col address
 	SSD7317_OLED_WR_CMD(0x00);
 	SSD7317_OLED_WR_CMD(0x7F);
@@ -127,70 +136,21 @@ void SSD7317_OLED_Blank(void)
 
 //////////////////////////////////////////////////////////
 
-static void SSD7317_OLED_Setup()
+//oled manufacturer supplied init commands
+const uint8_t SSD7317_128x32_Init[] =
+{
+	0xFD, 0x12, 0xAE, 0x20, 0x00, 0xAD, 0x10, 0xA8, 0x1F, 0xD3,
+	0x20, 0xA2, 0x00, 0xA0, 0xC8, 0xDA, 0x12, 0x81, 0x24, 0xA4,
+	0xA6, 0xD5, 0xA1, 0xD9, 0x43, 0xDB, 0x30, 0x31, 0xD0, 0x34,
+	0x0F, 0x37, 0x01, 0x36, 0x0F, 0x35, 0x0B, 0xAF
+};
+
+static void SSD7317_OLED_Setup(void)
 {
 	//initialise the oled driver ic
-	SSD7317_OLED_WR_CMD(0XFD); // Command Lock Main
-	SSD7317_OLED_WR_CMD(0X12); // 12H:Unlock 16:Lock
-
-	SSD7317_OLED_WR_CMD(0XAE); // Display OFF (sleep mode)
-
-	SSD7317_OLED_WR_CMD(0XAD); // External or internal IREF Selection
-	SSD7317_OLED_WR_CMD(0X00); //10 in , 00 ext
-
-	SSD7317_OLED_WR_CMD(0XA8); // Set Multiplex Ratio Main
-	SSD7317_OLED_WR_CMD(0X3f); // Set 64 duty -
-
-	SSD7317_OLED_WR_CMD(0XD3); // Set Display Offset
-	SSD7317_OLED_WR_CMD(0X10);
-
-	SSD7317_OLED_WR_CMD(0XA2); // Set Display Start Line
-	SSD7317_OLED_WR_CMD(0X00); // Start Line 00
-
-	SSD7317_OLED_WR_CMD(0XA1); // Set Segment Remap
-
-	SSD7317_OLED_WR_CMD(0XC8); // Set COM Output Scan Direction
-
-	SSD7317_OLED_WR_CMD(0XDA); //Com Pins Hardware
-	SSD7317_OLED_WR_CMD(0X12);
-
-	SSD7317_OLED_WR_CMD(0X81); // Set Contrast Control
-	SSD7317_OLED_WR_CMD(0X8f);
-
-	SSD7317_OLED_WR_CMD(0XA4); // A4:Display Ram ;A5:Display All Pixel
-
-	SSD7317_OLED_WR_CMD(0XA6); // A6:0 is Pixel off; A7:0 is Pixel on
-
-	SSD7317_OLED_WR_CMD(0XD5); // Set Front Clock Divider /Oscillator Frequency
-	SSD7317_OLED_WR_CMD(0X80);
-
-	SSD7317_OLED_WR_CMD(0XD9); // Set Pre-charge Period
-	SSD7317_OLED_WR_CMD(0X32);
-
-	SSD7317_OLED_WR_CMD(0XDB); //Set VcomH
-	SSD7317_OLED_WR_CMD(0X30);
-
-	//==============================================
-	SSD7317_OLED_WR_CMD(0X31);
-	SSD7317_OLED_WR_CMD(0Xd0);
-
-	SSD7317_OLED_WR_CMD(0X34);
-	SSD7317_OLED_WR_CMD(0X0f);
-
-	SSD7317_OLED_WR_CMD(0X37);
-	SSD7317_OLED_WR_CMD(0X01);
-
-	SSD7317_OLED_WR_CMD(0X36);
-	SSD7317_OLED_WR_CMD(0X0f);
-
-	SSD7317_OLED_WR_CMD(0X35);
-	SSD7317_OLED_WR_CMD(0X0b);
-	//=============================================
-
-	SSD7317_OLED_WR_CMD(0x20); //mem adressing mode
-	SSD7317_OLED_WR_CMD(0x01); //com-page h-mode
-
-	SSD7317_OLED_WR_CMD(0XAF); //display on
+	//send the init commands
+	for (uint8_t i = 0; i < sizeof(SSD7317_128x32_Init); i++)
+		SSD7317_OLED_WR_CMD(SSD7317_128x32_Init[i]);
 }
 
 static void SSD7317_OLED_WR_CMD(unsigned char command)
