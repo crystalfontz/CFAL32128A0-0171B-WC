@@ -86,33 +86,30 @@ void SSD7317_OLED_Init(void)
 
 void SSD7317_OLED_WriteBuffer(uint8_t *buf)
 {
-	uint16_t i;
-
-	//set top left address
-
-	//split write into 32 byte blocks due to Arduino libs
-	//I2C buffer size limit
-	for (i = 0; i < (SSD7317_OLED_HEIGHT * SSD7317_OLED_WIDTH / 8) / 32; i++)
+	//split write into 16 byte blocks due to Arduino libs I2C buffer size limit
+	uint16_t row, seg;
+	for (row = 0; row < 4; row++)
 	{
-		//update display ram loction if needed
-		if ((i % 4) == 0)
-		{
-			//start of page, set display ram position
-			SSD7317_OLED_WR_CMD(0x21);		//col address
-			SSD7317_OLED_WR_CMD(0);			//X (0 = left)
-			SSD7317_OLED_WR_CMD(0x7F);
+		//set display ram position
+		SSD7317_OLED_WR_CMD(0x21);		//set col address
+		SSD7317_OLED_WR_CMD(0);			//X (0 = left)
+		SSD7317_OLED_WR_CMD(0x7F);
 
-			SSD7317_OLED_WR_CMD(0x22);		//page address
-			SSD7317_OLED_WR_CMD(i >> 2);	//Y (0 = top, 3 = bottom)
-			SSD7317_OLED_WR_CMD(0x07);
+		SSD7317_OLED_WR_CMD(0x22);		//set page address
+		SSD7317_OLED_WR_CMD(row);		//Y (0 = top, 3 = bottom)
+		SSD7317_OLED_WR_CMD(0x07);
+
+		for (seg = 0; seg < 8; seg++)
+		{
+			//write data
+			Wire.beginTransmission(SSD7317_OLED_I2C_ADDR);
+			Wire.write(0x40);				//send control byte, data bit set
+			Wire.write(buf, 16);			//write 16 bytes
+			buf += 16;						//next buf location
+			Wire.endTransmission();			//end
 		}
-		//write data
-		Wire.beginTransmission(SSD7317_OLED_I2C_ADDR);
-		Wire.write(0x40);				//send control byte, data bit set
-		Wire.write(buf, 32);			//write 32 bytes
-		buf += 32;						//next buf location
-		Wire.endTransmission();			//end
 	}
+
 }
 
 void SSD7317_OLED_Blank(void)
