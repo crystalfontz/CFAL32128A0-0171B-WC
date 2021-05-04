@@ -70,7 +70,7 @@
 
 static void SSD7317_Touch_Setup(void);
 static void SSD7317_Touch_IRQ(void);
-static void SSD7317_Touch_Process(uint8_t *data);
+//static void SSD7317_Touch_Process(uint8_t *data);
 uint16_t SSD7317_TIC_CPU_BurstRead(uint16_t address, uint8_t data[], uint16_t num);
 uint16_t SSD7317_TIC_CPU_RegRead();
 

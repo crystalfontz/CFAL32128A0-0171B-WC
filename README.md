@@ -7,6 +7,10 @@ This product can be found here:
 https://www.crystalfontz.com/product/cfal32128a00171bwc
 
 ## Display Connection Details
+
+By default the "prefs.h" file is configured for I2C display & touch interfaces.
+You'll need to edit the file if using a different interface configuration.
+
 ### Display using SPI interface
 | OLED / Touch Module Pin | Seeeduino Pin | Connection Description |
 |-------------------------|---------------|------------------------|
@@ -23,11 +27,13 @@ https://www.crystalfontz.com/product/cfal32128a00171bwc
 |-------------------------|---------------|------------------------|
 | 17 (DCS)                | 3.3V          | Display CS (tied high) |
 | 19 (RES)                | 3             | Display Reset          |
-| 21 (D/C)                | GND           | Display D/C (tied low) |
+| 21 (D/C)                | GND           | Display D/C (see note) |
 | 26 (D0)                 | SCL           | Display I2C SCL        |
 | 27 (D1)                 | SDA           | Display I2C SDA        |
 | 29 (D2)                 | SDA           | Display I2C SDA        |
 | 29 (BS1)                | 3.3V          | Display I2C Select     |
+
+note: The D/C pin selects display I2C address. See "prefs.h" for details.
 
 ## Touch Connection Details
 ### Touch using SPI interface

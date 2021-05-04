@@ -7,21 +7,36 @@
 //
 //==============================================================================
 
-//The BS1 pin on the module selects display I2C or SPI interface mode:
-// SPI: BS1 = low (gnd)
-// I2C: BS1 = high (3.3v)
+// OLED INTERFACE MODE SELECTION
+// The BS1 pin on the module selects display I2C or SPI interface mode:
+//  SPI: BS1 = low (gnd)
+//  I2C: BS1 = high (3.3v)
+// One of the following must be enabled.
+//#define OLED_SPI
+#define OLED_I2C
 
-//this setting must correspond with the BS1 mode selection pin
-#define OLED_SPI
-//#define OLED_I2C
+// OLED I2C ADDRESS SELECTION
+// If using the OLED in I2C mode, the D/C pin selects one of two addresses:
+// D/C low = 0x3C
+// D/C high = 0x3D
+// One of the following must be enabled.
+#define SSD7317_OLED_I2C_ADDR	(0x3C)
+//#define SSD7317_OLED_I2C_ADDR	(0x3D)
 
-//The BS3 pin on the module selects touch I2C or SPI interface mode:
+// TOUCH INTERFACE SELECTION
+// The BS3 pin on the module selects touch I2C or SPI interface mode:
 // SPI: BS3 = low (gnd)
 // I2C: BS3 = high (3.3v)
-
-//this setting must correspond with the BS3 mode selection pin
+// One of the following must be enabled.
 #define TOUCH_I2C
 //#define TOUCH_SPI
+
+// TOUCH I2C ADDRESS SELECTION
+// If using the touch panel in I2C mode, the touch I2C base address is set
+// via an OLED init command. One of two addresses can be selected.
+// One of the following must be enabled.
+#define SSD7317_TOUCH_I2C_ADDR	(0x53)
+//#define SSD7317_TOUCH_I2C_ADDR	(0x5B)
 
 //==============================================================================
 
@@ -42,20 +57,17 @@
 #define SSD7317_OLED_SPI_DC		(8)				/*D/C*/
 
 //oled common pins
-#define SSD7317_OLED_RST		(3)		/*RES*/
+#define SSD7317_OLED_RST		(3)				/*RES*/
 
 //SPI coms frequency
 #define SSD7317_OLED_SPI_FREQ	(8000000)
 #define SSD7317_TOUCH_SPI_FREQ	(8000000)
 
-//oled i2c address
-#define SSD7317_OLED_I2C_ADDR	(0x3C)
-
 //touch controller I2C interface pins on the Seeeduino
 #define SSD7317_TOUCH_SCL		(SCL)			/*TD0*/
 #define SSD7317_TOUCH_SDA		(SDA)			/*TD1,TD2*/
 #define SSD7317_TOUCH_CS		(9)				/*TCS*/
-#define SSD7317_TOUCH_RST		(4)		/*TRES*/
+#define SSD7317_TOUCH_RST		(4)				/*TRES*/
 #define SSD7317_TOUCH_IRQ		(2)				/*IRQ*/
 
 ///////////////////////////////////////////////////////////////
@@ -71,6 +83,9 @@
 # ifdef OLED_SPI
 # error OLED_I2C or OLED_SPI (not both) must be set in prefs.h
 # endif
+# ifndef SSD7317_OLED_I2C_ADDR
+# error OLED I2C address not selected in prefs.h
+# endif
 #endif
 
 #ifndef TOUCH_I2C
@@ -82,5 +97,8 @@
 #ifdef TOUCH_I2C
 # ifdef TOUCH_SPI
 # error TOUCH_I2C or TOUCH_SPI (not both) must be set in prefs.h
+# endif
+# ifndef SSD7317_TOUCH_I2C_ADDR
+# error TOUCH I2C address not selected in prefs.h
 # endif
 #endif

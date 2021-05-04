@@ -64,7 +64,6 @@
 
 //////////////////////////////////////////////////////////
 
-#define SSD7317_BASE_I2C_ADDR		0x5B
 #define SOFT_I2C_READ(a)			((a) << 1)
 #define SOFT_I2C_WRITE(a)			(((a) << 1) | 0x01)
 
@@ -74,7 +73,7 @@
 
 static void SSD7317_Touch_Setup(void);
 static void SSD7317_Touch_IRQ(void);
-static void SSD7317_Touch_Process(uint8_t *data);
+//static void SSD7317_Touch_Process(uint8_t *data);
 uint16_t SSD7317_TIC_CPU_BurstRead(uint16_t address, uint8_t data[], uint16_t num);
 
 volatile SSD7317_InTouch_t SSD7317_Gesture_Data;
@@ -292,7 +291,7 @@ uint16_t SSD7317_TIC_BIOS_RegRead()
 	addr[1] = (uint8_t) ((address >> 8) & 0xFF);
 
 	SSD7317_TIC_Start();
-	data[0] = SOFT_I2C_READ(SSD7317_BASE_I2C_ADDR);
+	data[0] = SOFT_I2C_READ(SSD7317_TOUCH_I2C_ADDR);
 	SSD7317_TIC_nByte_WR(data, 1);
 	SSD7317_TIC_nByte_WR(addr, 2);
 	SSD7317_TIC_Stop();
@@ -300,7 +299,7 @@ uint16_t SSD7317_TIC_BIOS_RegRead()
 	delayMicroseconds(80);
 
 	SSD7317_TIC_Start();
-	data[0] = SOFT_I2C_WRITE(SSD7317_BASE_I2C_ADDR);
+	data[0] = SOFT_I2C_WRITE(SSD7317_TOUCH_I2C_ADDR);
 	SSD7317_TIC_nByte_WR(data, 1);
 	SSD7317_TIC_nByte_RD(data, 2);
 	SSD7317_TIC_Stop();
@@ -313,7 +312,7 @@ uint16_t SSD7317_TIC_BIOS_RegWrite(uint16_t address)
 {
 	uint8_t wd8[3];
 
-	wd8[0] = SOFT_I2C_READ(SSD7317_BASE_I2C_ADDR);
+	wd8[0] = SOFT_I2C_READ(SSD7317_TOUCH_I2C_ADDR);
 	wd8[1] = (uint8_t) ((address >> 0) & 0xFF);
 	wd8[2] = (uint8_t) ((address >> 8) & 0xFF);
 
@@ -328,7 +327,7 @@ uint16_t SSD7317_TIC_BIOS_BurstWrite(uint16_t address, uint8_t data[], uint16_t 
 {
 	uint8_t wd8[3];
 
-	wd8[0] = SOFT_I2C_READ(SSD7317_BASE_I2C_ADDR | 0x04);
+	wd8[0] = SOFT_I2C_READ(SSD7317_TOUCH_I2C_ADDR | 0x04);
 	wd8[1] = (uint8_t) ((address >> 0) & 0xFF);
 	wd8[2] = (uint8_t) ((address >> 8) & 0xFF);
 
@@ -346,7 +345,7 @@ uint16_t SSD7317_TIC_BIOS_BurstWrite_PROGMEM(uint16_t address, uint8_t data[], u
 	uint8_t wd8[3];
 	uint16_t i;
 
-	wd8[0] = SOFT_I2C_READ(SSD7317_BASE_I2C_ADDR | 0x04);
+	wd8[0] = SOFT_I2C_READ(SSD7317_TOUCH_I2C_ADDR | 0x04);
 	wd8[1] = (uint8_t) ((address >> 0) & 0xFF);
 	wd8[2] = (uint8_t) ((address >> 8) & 0xFF);
 
@@ -366,7 +365,7 @@ uint16_t SSD7317_TIC_BIOS_BurstRead(uint16_t address, uint8_t data[], uint16_t n
 {
 	uint8_t wd8[3];
 
-	wd8[0] = SOFT_I2C_READ(SSD7317_BASE_I2C_ADDR | 0x04);
+	wd8[0] = SOFT_I2C_READ(SSD7317_TOUCH_I2C_ADDR | 0x04);
 	wd8[1] = (uint8_t) ((address >> 0) & 0xFF);
 	wd8[2] = (uint8_t) ((address >> 8) & 0xFF);
 
@@ -376,7 +375,7 @@ uint16_t SSD7317_TIC_BIOS_BurstRead(uint16_t address, uint8_t data[], uint16_t n
 
 	delayMicroseconds(80);
 
-	wd8[0] = SOFT_I2C_WRITE(SSD7317_BASE_I2C_ADDR | 0x04);
+	wd8[0] = SOFT_I2C_WRITE(SSD7317_TOUCH_I2C_ADDR | 0x04);
 	SSD7317_TIC_Start();
 	SSD7317_TIC_nByte_WR(wd8, 1);
 	SSD7317_TIC_nByte_RD(data, num);
@@ -394,20 +393,20 @@ uint16_t SSD7317_TIC_CPU_BurstRead(uint16_t address, uint8_t data[], uint16_t nu
 		//use hardware I2C
 		wd8[0] = (uint8_t) ((address >> 0) & 0xFF);
 		wd8[1] = (uint8_t) ((address >> 8) & 0xFF);
-		Wire.beginTransmission(SSD7317_BASE_I2C_ADDR);
+		Wire.beginTransmission(SSD7317_TOUCH_I2C_ADDR);
 		Wire.write(wd8, 2);
 		Wire.endTransmission();
 
 		delayMicroseconds(80);
 
-		Wire.requestFrom(SSD7317_BASE_I2C_ADDR, num);
+		Wire.requestFrom(SSD7317_TOUCH_I2C_ADDR, num);
 		while (Wire.available() < (int)num) {}
 		Wire.readBytes(data, num);
 	}
 	else
 	{
 		//use software I2C
-		wd8[0] = SOFT_I2C_READ(SSD7317_BASE_I2C_ADDR);
+		wd8[0] = SOFT_I2C_READ(SSD7317_TOUCH_I2C_ADDR);
 		wd8[1] = (uint8_t) ((address >> 0) & 0xFF);
 		wd8[2] = (uint8_t) ((address >> 8) & 0xFF);
 		SSD7317_TIC_Start();
@@ -416,7 +415,7 @@ uint16_t SSD7317_TIC_CPU_BurstRead(uint16_t address, uint8_t data[], uint16_t nu
 
 		delayMicroseconds(80);
 
-		wd8[0] = SOFT_I2C_WRITE(SSD7317_BASE_I2C_ADDR);
+		wd8[0] = SOFT_I2C_WRITE(SSD7317_TOUCH_I2C_ADDR);
 		SSD7317_TIC_Start();
 		SSD7317_TIC_nByte_WR(wd8, 1);
 		SSD7317_TIC_nByte_RD(data, num);
@@ -430,7 +429,7 @@ uint16_t SSD7317_TIC_CPU_BurstWrite(uint16_t address, uint8_t data[], uint16_t n
 {
 	uint8_t wd8[3];
 
-	wd8[0] = SOFT_I2C_READ(SSD7317_BASE_I2C_ADDR);
+	wd8[0] = SOFT_I2C_READ(SSD7317_TOUCH_I2C_ADDR);
 	wd8[1] = (uint8_t) ((address >> 0) & 0xFF);
 	wd8[2] = (uint8_t) ((address >> 8) & 0xFF);
 
