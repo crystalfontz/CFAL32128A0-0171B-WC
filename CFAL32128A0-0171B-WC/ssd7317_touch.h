@@ -1,9 +1,6 @@
 #pragma once
 
 #include "prefs.h"
-
-#ifdef TOUCH_SPI
-
 #include <Arduino.h>
 
 //////////////////////////////////////////////
@@ -13,6 +10,8 @@
 #define SSD7317_TOUCH_CS_SET	digitalWrite(SSD7317_TOUCH_CS, HIGH)
 //touch IRQ pin
 #define SSD7317_TOUCH_IRQ_RD	digitalRead(SSD7317_TOUCH_IRQ)
+
+#ifdef TOUCH_I2C
 //touch I2C SCL
 #define SSD7317_TOUCH_SCL_CLR	digitalWrite(SSD7317_TOUCH_SCL, LOW)
 #define SSD7317_TOUCH_SCL_SET	digitalWrite(SSD7317_TOUCH_SCL, HIGH)
@@ -20,6 +19,7 @@
 #define SSD7317_TOUCH_SDA_CLR	digitalWrite(SSD7317_TOUCH_SDA, LOW)
 #define SSD7317_TOUCH_SDA_SET	digitalWrite(SSD7317_TOUCH_SDA, HIGH)
 // #define SSD7317_TOUCH_SDA_RD	digitalRead(SSD7317_TOUCH_SDA) /*this is a function*/
+#endif
 
 typedef struct
 {
@@ -49,5 +49,3 @@ void SSD7317_SingleTap_MaxFrames_Set(uint16_t frames);
 void SSD7317_SkipFrames_AfterGestureReport(uint16_t frames);
 void SSD7317_LPM_ScanRate_Set(uint16_t rate);
 void SSD7317_ReportingMode_Set(uint16_t mode);
-
-#endif

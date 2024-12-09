@@ -51,9 +51,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "prefs.h"
-#include "ssd7317_oled_i2c.h"
-#include "ssd7317_touch_i2c.h"
-#include "ssd7317_touch_spi.h"
+#include "ssd7317_oled.h"
+#include "ssd7317_touch.h"
 #include "font_8x8x1.h"
 
 //////////////////////////////////////////////////////////
@@ -119,7 +118,7 @@ void setup()
 	Wire.begin();
 	SSD7317_Touch_HWI2C(true);
 	//kick the i2c speed up to 400kHz
-	Wire.setClock(400000);
+	Wire.setClock(5000);
 #endif
 
 	//done inits
